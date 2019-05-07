@@ -1,0 +1,206 @@
+---
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+params:
+  ClickedCountry: NA
+  StartingYear: NA
+  CurrentYear: NA
+---
+
+```{r global options, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)          # Prevents R code from appearing in the output document.
+knitr::opts_chunk$set(warning = FALSE)       # Prevents warnings from appearing in the output document.
+knitr::opts_chunk$set(message = FALSE)       # Prevents messages from appearing in the output document.
+knitr::opts_chunk$set(fig.align = "center")  # Centers all the plots.
+knitr::opts_chunk$set(out.width = '100%')    # Makes plots occupy 100% of the page's width.
+knitr::opts_chunk$set(fig.width = 10)        # Makes plots 10 inch wide.
+```
+
+# **Scotland's Exports to `r params$ClickedCountry` in `r params$CurrentYear`**
+
+![](flags/`r paste(params$ClickedCountry, "png", sep=".")`)
+  
+***
+
+```{r obtaining numbers}
+# DATA
+COUNTRIES <- read.csv("COUNTRIES.csv")
+TOTALS <- read.csv("TOTALS.csv")
+COUNTRIES_ACTIVITY <- read.csv("COUNTRIES_ACTIVITY.csv")  
+COUNTRIES_TOP10 <- read.csv("COUNTRIES_TOP10.csv")  
+
+# OVERVIEW
+ThisYearValue <- subset(COUNTRIES, COUNTRIES$Country  == params$ClickedCountry)
+ThisYearValue <- subset(ThisYearValue, ThisYearValue$Year  == params$CurrentYear)
+ThisYearValue <- ThisYearValue$Total
+
+ThisYearPercent <- subset(COUNTRIES, COUNTRIES$Country == params$ClickedCountry)
+ThisYearPercent <- subset(ThisYearPercent, ThisYearPercent$Year == params$CurrentYear)
+ThisYearPercent <- ThisYearPercent$Fraction
+
+LastYearValue <- subset(COUNTRIES, COUNTRIES$Country  == params$ClickedCountry)
+LastYearValue <- subset(LastYearValue, LastYearValue$Year == params$CurrentYear-1)
+LastYearValue <- LastYearValue$Total
+
+Ago5Value <- subset(COUNTRIES, COUNTRIES$Country  == params$ClickedCountry)
+Ago5Value <- subset(Ago5Value, Ago5Value$Year == params$CurrentYear-3)
+Ago5Value <- Ago5Value$Total
+
+AllExports <- subset(TOTALS, TOTALS$year == params$CurrentYear)
+AllExports <- AllExports$International
+
+RankedAs <- subset(COUNTRIES, COUNTRIES$Country  == params$ClickedCountry)
+RankedAs <- subset(RankedAs, RankedAs$Year  == params$CurrentYear)
+RankedAs <- RankedAs$Rank
+
+ChangedOverYear <- subset(COUNTRIES, COUNTRIES$Country  == params$ClickedCountry)
+ChangedOverYear <- subset(ChangedOverYear, ChangedOverYear$Year  == params$CurrentYear)
+ChangedOverYear <- ChangedOverYear$YearPercentChange
+
+ChangedOver5Years <- subset(COUNTRIES, COUNTRIES$Country  == params$ClickedCountry)
+ChangedOver5Years <- subset(ChangedOver5Years, ChangedOver5Years$Year  == params$CurrentYear)
+ChangedOver5Years <- ChangedOver5Years$FiveYearPercentChange
+
+if(ChangedOverYear > 0){Change = "an increase"}else{ Change = "a decrease"} 
+if(ChangedOver5Years > 0){Changed5 = "increased"}else{Changed5 = "decreased"}
+if(ChangedOver5Years > 0){UpOrDown = "up"}else{UpOrDown = "down"}
+
+# 
+
+TopSector <- subset(COUNTRIES_TOP10, COUNTRIES_TOP10$Country == params$ClickedCountry)
+TopSector <- subset(TopSector, TopSector$Rank == 1)
+TopSector <- TopSector$Sector
+
+TopSectorValue <- subset(COUNTRIES_TOP10, COUNTRIES_TOP10$Country == params$ClickedCountry)
+TopSectorValue <- subset(TopSectorValue, TopSectorValue$Rank == 1)
+TopSectorValue <- TopSectorValue$Value
+
+TopSectorFraction <- subset(COUNTRIES_TOP10, COUNTRIES_TOP10$Country == params$ClickedCountry)
+TopSectorFraction <- subset(TopSectorFraction, TopSectorFraction$Rank == 1)
+TopSectorFraction <- TopSectorFraction$Fraction
+
+if(ThisYearValue > Ago5Value){PercentChange5 = round(((ThisYearValue/Ago5Value)-1)*100, 2)}else{PercentChange5 = round(((Ago5Value/ThisYearValue)-1)*100, 2)} 
+
+# SECTOR BREAKDOWN
+Manufacturing <- subset(COUNTRIES_ACTIVITY, COUNTRIES_ACTIVITY$Country == params$ClickedCountry)
+Manufacturing <- subset(Manufacturing, Manufacturing$Activity == "Manufacturing")
+Manufacturing <- Manufacturing$Value
+
+Services <- subset(COUNTRIES_ACTIVITY, COUNTRIES_ACTIVITY$Country == params$ClickedCountry)
+Services <- subset(Services, Services$Activity == "Services")
+Services <- Services$Value
+
+Other <- subset(COUNTRIES_ACTIVITY, COUNTRIES_ACTIVITY$Country == params$ClickedCountry)
+Other <- subset(Other, Other$Activity == "Other")
+Other <- Other$Value
+
+ManufacturingPercent <- subset(COUNTRIES_ACTIVITY, COUNTRIES_ACTIVITY$Country == params$ClickedCountry)
+ManufacturingPercent <- subset(ManufacturingPercent, ManufacturingPercent$Activity == "Manufacturing")
+ManufacturingPercent <- ManufacturingPercent$Fraction
+
+ServicesPercent <- subset(COUNTRIES_ACTIVITY, COUNTRIES_ACTIVITY$Country == params$ClickedCountry)
+ServicesPercent <- subset(ServicesPercent, ServicesPercent$Activity == "Services")
+ServicesPercent <- ServicesPercent$Fraction
+
+OtherPercent <- subset(COUNTRIES_ACTIVITY, COUNTRIES_ACTIVITY$Country == params$ClickedCountry)
+OtherPercent <- subset(OtherPercent, OtherPercent$Activity == "Other")
+OtherPercent <- OtherPercent$Fraction 
+
+
+```
+
+
+## **Overview** 
+Scottish exports of goods and services (excluding oil and gas) to `r params$ClickedCountry` were estimated to be worth  \£`r format(ThisYearValue,big.mark=",")` million (`r ThisYearPercent`% of all international exports) in `r params$CurrentYear`, `r Change` of  \£`r format(abs(ThisYearValue-LastYearValue), big.mark=",") ` million (`r abs(ChangedOverYear)`%) from \£`r format(LastYearValue, big.mark=",")` million in `r params$CurrentYear - 1`. 
+  
+`r params$ClickedCountry` was ranked as Scotland's number `r RankedAs` largest export destination in `r params$CurrentYear`.  
+
+The figure below shows that exports to `r params$ClickedCountry` have `r Changed5` since `r params$CurrentYear - 5` and are `r UpOrDown` \£`r abs(ThisYearValue - Ago5Value)` million (`r abs(ChangedOver5Years)`%).
+
+<center>**Figure 1. Scotland's Exports to `r params$ClickedCountry` (`r params$StartingYear` - `r params$CurrentYear`)**</center>
+
+```{r Render Figure 1}
+library(ggplot2)
+library(ggsci)
+COUNTRIES <- read.csv("COUNTRIES.csv")
+
+ggplot(data = subset(COUNTRIES, COUNTRIES$Country == params$ClickedCountry),
+    aes(x = Year, y = Total)) +
+    geom_bar(position = 'dodge', stat='identity', width = 0.3, fill="steelblue") +
+    geom_text(aes(label=Total), position=position_dodge(width=0.9), vjust=-0.25) +
+    scale_x_continuous(breaks = seq(params$StartingYear, params$CurrentYear)) +
+    theme_minimal() +
+    ylab("Value (\U00A3  million)") +
+    scale_fill_jama()
+```
+
+## **Sector Breakdown**
+Manufacturing sectors, accounted for \£`r format(Manufacturing, big.mark=",")` million (`r ManufacturingPercent`%). Exports of services accounted for \£`r format(Services, big.mark=",")` million (`r ServicesPercent`%), while the remaining \£`r format(Other, big.mark=",")` million (`r OtherPercent`%) came from other (1) sectors.
+  
+(1): Other includes Agriculture, forestry and fishing, Mining and quarrying, Utilities and Construction.
+  
+The figure below shows the full breakdown of Scotland's exports to `r params$ClickedCountry` in `r params$CurrentYear`.
+
+<center>**Figure 2. Breakdown of Scotland's Exports to `r params$ClickedCountry` in `r params$CurrentYear`**</center>
+
+```{r Render Figure 2}
+library(ggplot2)
+library(scales)
+library(ggsci)
+COUNTRIES_ACTIVITY <- read.csv("COUNTRIES_ACTIVITY.csv")
+COUNTRIES_ACTIVITY$Activity <- factor(COUNTRIES_ACTIVITY$Activity, levels = c("Manufacturing", "Services", "Other"))
+
+ggplot(data = subset(COUNTRIES_ACTIVITY, COUNTRIES_ACTIVITY$Country == params$ClickedCountry), aes(x=Activity, y = Value, fill = Activity)) +
+    geom_col(stat = "identity", width = 0.5) + 
+    geom_text(aes(label = Value), position = position_dodge(width = 0.9), vjust = -0.5) +
+    geom_text(aes(label = paste(round((Value/sum(Value))*100, 2),"%")), position=position_dodge(width=0.9), vjust=2, color="white") +
+    theme_minimal() +
+    ylab("Value (\U00A3  million)") +
+    xlab("") +
+    theme(legend.position="none") +
+    scale_fill_jama() +
+    theme(axis.text=element_text(size=14))
+```
+
+The top sector in `r params$CurrentYear` was exports of `r TopSector` which accounted for \£`r format(TopSectorValue, big.mark=",")` million (`r TopSectorFraction`%) of exports to `r params$ClickedCountry`. The other top export sectors to `r params$ClickedCountry` are given in the table below:
+
+<center>**Table 1. Top Export Sectors to `r params$ClickedCountry` in `r params$CurrentYear` (\£  million)**</center>
+<center>
+```{r Render Table 1, results="asis"}
+library(flextable)    # For flextable(), which renders table for Word documents.
+library(gridExtra)    # For grid.table(), which renders table for PDF documents.
+library(magrittr)     # For the pipe %>% operator
+library(tableHTML)    # For tableHTML(), which renders table for the website.
+
+COUNTRIES_TOP10 <- read.csv("COUNTRIES_TOP10.csv")
+COUNTRIES_TOP10 <- subset(COUNTRIES_TOP10, COUNTRIES_TOP10$Country == params$ClickedCountry)
+COUNTRIES_TOP10 <- data.frame(Rank = COUNTRIES_TOP10$Rank, Sector = COUNTRIES_TOP10$Sector, Value = COUNTRIES_TOP10$Value, Fraction = COUNTRIES_TOP10$Fraction)
+
+# Condition that uses different methods to create the table based on document type.
+doc.type <- knitr::opts_knit$get('rmarkdown.pandoc.to')
+if (doc.type == "docx"){
+  fx <- flextable(COUNTRIES_TOP10, cwidth = 2)
+  fx <- theme_vanilla(fx)
+  fx
+} else if (doc.type == "latex"){ 
+  grid.table(COUNTRIES_TOP10)
+} else {
+  tableHTML(
+    COUNTRIES_TOP10,
+    rownames = FALSE,
+    headers = c("Rank", "Sector", "Value", "% of Total"),
+    widths = c(100, 350,100,100),
+  ) %>%
+  add_css_header(css = list('text-align', 'center'), headers = c(1,3,4)) %>%
+  add_css_header(css = list('color', 'white'), headers = c(1,2,3,4)) %>%
+  add_css_header(css = list('background-color', 'grey'), headers = c(1,2,3,4)) %>%
+  add_css_column(css = list('text-align', 'left'), columns = c(2)) %>%
+  add_css_column(css = list('text-align', 'right'), columns = c(2)) %>%
+  add_theme(theme = "rshiny-blue")
+}
+```
+</center>  
+  
+

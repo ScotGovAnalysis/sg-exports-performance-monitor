@@ -1,0 +1,17 @@
+---
+title: "NoDataMSG"
+author: "Kamil Szymkowski"
+date: "28/04/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## No Data
+
+Data on the clicked country cannot be display. This might be because:
+
+* Scotland does not export to this country or we do not hold data on this country.
++ Available data is not robust enough to be published (less than \£50 million).

@@ -16,201 +16,312 @@ knitr::opts_chunk$set(message = FALSE)       # Prevents messages from appearing 
 knitr::opts_chunk$set(fig.align = "center")  # Centers all the plots.
 knitr::opts_chunk$set(out.width = '100%')    # Makes plots occupy 100% of the page's width.
 knitr::opts_chunk$set(fig.width = 10)        # Makes plots 10 inch wide.
+
 ```
 
 # **Scotland's Exports from `r params$ClickedSector` sector in `r params$CurrentYear`**
 
 ***
 
-```{r calculating numbers}
-SECTORS <- read.csv("SECTORS.csv")
-SUBSECTORS <- read.csv("SUBSECTORS.csv")
+```{r Calculating numbers}
+SECTORS <- read.csv("./Base Datatables/SECTORS.csv")
+SUBSECTORS <- read.csv("./Base Datatables/SUBSECTORS.csv")
 
 # OVERVIEW
-ThisYearInt <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-ThisYearInt <- subset(ThisYearInt, ThisYearInt$Year == params$CurrentYear)
-ThisYearInt <- ThisYearInt$International
+ThisYearInt <- SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  pull(International)
 
-ThisYearIntPercent <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-ThisYearIntPercent <- subset(ThisYearIntPercent, ThisYearIntPercent$Year == params$CurrentYear)
-ThisYearIntPercent <- ThisYearIntPercent$PercentInternational
-  
-ThisYearRUK <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-ThisYearRUK <- subset(ThisYearRUK, ThisYearRUK$Year == params$CurrentYear)
-ThisYearRUK <- ThisYearRUK$RUK
+ThisYearIntPercent <-  SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  pull(PercentInternational)
 
-ThisYearRUKPercent <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-ThisYearRUKPercent <- subset(ThisYearRUKPercent, ThisYearRUKPercent$Year == params$CurrentYear)
-ThisYearRUKPercent <- ThisYearRUKPercent$PercentRUK
+ThisYearRUK <-  SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  pull(RUK)
 
-Ago5Int <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-Ago5Int <- subset(Ago5Int, Ago5Int$Year == params$CurrentYear-5)
-Ago5Int <- Ago5Int$International
+ThisYearRUKPercent <-  SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  pull(PercentRUK)
 
-Ago5RUK <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-Ago5RUK <- subset(Ago5RUK, Ago5RUK$Year == params$CurrentYear-5)
-Ago5RUK <- Ago5RUK$International
+Ago5Int <- SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == (params$CurrentYear - 5)) %>% 
+  pull(International) 
+
+Ago5RUK <-  SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == (params$CurrentYear - 5)) %>% 
+  pull(RUK) 
 
 # SUBSECTORS
-TopSubsectorRUKName <- subset(SUBSECTORS, SUBSECTORS$Sector == params$ClickedSector)
-TopSubsectorRUKName <- subset(TopSubsectorRUKName, TopSubsectorRUKName$Year== params$CurrentYear)  
-TopSubsectorRUKName <- TopSubsectorRUKName[TopSubsectorRUKName$RUK == max(TopSubsectorRUKName$RUK),]
-TopSubsectorRUKName <- TopSubsectorRUKName$Subsector
+TopSubsectorRUKName <- SUBSECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  filter(RUK == max(as.numeric(RUK), na.rm = TRUE)) %>% 
+  pull(Subsector)
 
-TopSubsectorRUKValue <- subset(SUBSECTORS, SUBSECTORS$Sector == params$ClickedSector)
-TopSubsectorRUKValue <- subset(TopSubsectorRUKValue, TopSubsectorRUKValue$Year== params$CurrentYear)  
-TopSubsectorRUKValue <- TopSubsectorRUKValue[TopSubsectorRUKValue$RUK == max(TopSubsectorRUKValue$RUK),]
-TopSubsectorRUKValue <- TopSubsectorRUKValue$RUK
-  
-TopSubsectorRUKPercent <- subset(SUBSECTORS, SUBSECTORS$Sector == params$ClickedSector)
-TopSubsectorRUKPercent <- subset(TopSubsectorRUKPercent, TopSubsectorRUKPercent$Year== params$CurrentYear)  
-TopSubsectorRUKPercent <- TopSubsectorRUKPercent[TopSubsectorRUKPercent$RUK == max(TopSubsectorRUKPercent$RUK),]
-TopSubsectorRUKPercent <- TopSubsectorRUKPercent$PercentRUK
+TopSubsectorRUKValue <- SUBSECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  filter(RUK == max(as.numeric(RUK), na.rm = TRUE)) %>% 
+  pull(RUK)
+
+TopSubsectorRUKPercent <- SUBSECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  filter(RUK == max(as.numeric(RUK), na.rm = TRUE)) %>% 
+  pull(PercentRUK)
 
 #
-TopSubsectorINTName <- subset(SUBSECTORS, SUBSECTORS$Sector == params$ClickedSector)
-TopSubsectorINTName <- subset(TopSubsectorINTName, TopSubsectorINTName$Year== params$CurrentYear)  
-TopSubsectorINTName <- TopSubsectorINTName[TopSubsectorINTName$International == max(TopSubsectorINTName$International),]
-TopSubsectorINTName <- TopSubsectorINTName$Subsector
+TopSubsectorINTName <- SUBSECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  filter(International == max(as.numeric(International), na.rm = TRUE)) %>% 
+  pull(Subsector) 
 
-TopSubsectorINTValue <- subset(SUBSECTORS, SUBSECTORS$Sector == params$ClickedSector)
-TopSubsectorINTValue <- subset(TopSubsectorINTValue, TopSubsectorINTValue$Year== params$CurrentYear)  
-TopSubsectorINTValue <- TopSubsectorINTValue[TopSubsectorINTValue$International == max(TopSubsectorINTValue$International),]
-TopSubsectorINTValue <- TopSubsectorINTValue$International
-  
-TopSubsectorINTPercent <- subset(SUBSECTORS, SUBSECTORS$Sector == params$ClickedSector)
-TopSubsectorINTPercent <- subset(TopSubsectorINTPercent, TopSubsectorINTPercent$Year== params$CurrentYear)  
-TopSubsectorINTPercent <- TopSubsectorINTPercent[TopSubsectorINTPercent$International == max(TopSubsectorINTPercent$International),]
-TopSubsectorINTPercent <- TopSubsectorINTPercent$PercentInternational
+TopSubsectorINTValue <- SUBSECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  filter(International == max(as.numeric(International), na.rm = TRUE)) %>% 
+  pull(International) 
+
+TopSubsectorINTPercent <- SUBSECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  filter(International == max(as.numeric(International), na.rm = TRUE)) %>% 
+  pull(PercentInternational) 
 
 # BUSINESS STATISTICS
-BUSINESS_STATS <- read.csv("BUSINESS_STATS.csv")
+BUSINESS_STATS <- read_csv("./Base Datatables/BUSINESS_STATS.csv", na = "N/A")
 
-TotalEnterprises <- subset(BUSINESS_STATS, BUSINESS_STATS$Sector == params$ClickedSector)
-TotalEnterprises <- subset(TotalEnterprises, TotalEnterprises$Subsector == "Total")
-TotalEnterprises <- TotalEnterprises$Enterprises
+TotalEnterprises <- BUSINESS_STATS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Subsector == "Total" ) %>% 
+  pull(Enterprises) %>% 
+  as.numeric()
 
-TotalEmployment <- subset(BUSINESS_STATS, BUSINESS_STATS$Sector == params$ClickedSector)
-TotalEmployment <- subset(TotalEmployment, TotalEmployment$Subsector == "Total")
-TotalEmployment <- TotalEmployment$Employment
+TotalEmployment <- BUSINESS_STATS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Subsector == "Total" ) %>% 
+  pull(Employment) %>% 
+  as.numeric()
 
-TotalTurnover <- subset(BUSINESS_STATS, BUSINESS_STATS$Sector == params$ClickedSector)
-TotalTurnover <- subset(TotalTurnover, TotalTurnover$Subsector == "Total")
-TotalTurnover <- TotalTurnover$Turnover
+TotalTurnover <- BUSINESS_STATS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Subsector == "Total" ) %>% 
+  pull(Turnover) %>% 
+  as.numeric()
 
 #
-VYearPercentChangeRuk <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-VYearPercentChangeRuk <- subset(VYearPercentChangeRuk, VYearPercentChangeRuk$Year == params$CurrentYear)
-VYearPercentChangeRuk <- VYearPercentChangeRuk$YearPercentChangeRuk
+VYearPercentChangeRuk <- SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  pull(YearPercentChangeRuk)
 
-VYearPercentChangeInt <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-VYearPercentChangeInt <- subset(VYearPercentChangeInt, VYearPercentChangeInt$Year == params$CurrentYear)
-VYearPercentChangeInt <- VYearPercentChangeInt$YearPercentChangeInt
+VYearPercentChangeInt <- SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  pull(YearPercentChangeInt)
 
-VFiveYearPercentChangeRuk <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-VFiveYearPercentChangeRuk <- subset(VFiveYearPercentChangeRuk, VFiveYearPercentChangeRuk$Year == params$CurrentYear)
-VFiveYearPercentChangeRuk <- VFiveYearPercentChangeRuk$FiveYearPercentChangeRuk
+VFiveYearPercentChangeRuk <- SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  pull(FiveYearPercentChangeRuk)
 
-VFiveYearPercentChangeInt <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-VFiveYearPercentChangeInt <- subset(VFiveYearPercentChangeInt, VFiveYearPercentChangeInt$Year == params$CurrentYear)
-VFiveYearPercentChangeInt <- VFiveYearPercentChangeInt$FiveYearPercentChangeInt
+VFiveYearPercentChangeInt <- SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  filter(Year == params$CurrentYear) %>% 
+  pull(FiveYearPercentChangeInt)
 
 if(VFiveYearPercentChangeInt  > 0){IntChanged = "increased"}else{IntChanged = "decreased"}
 if(VFiveYearPercentChangeRuk  > 0){RUKChanged = "increased"}else{RUKChanged = "decreased"}
 ```
 
 ## **Export Performance**
-In `r params$CurrentYear`, Scotland's international exports from the `r params$ClickedSector` sector were worth \£`r format(ThisYearInt, big.mark=",")` million and accounted for `r ThisYearIntPercent`% of total international exports.  Exports to the rest of the UK from this sector were worth \£`r format(ThisYearRUK, big.mark=",")` million in `r params$CurrentYear` and accounted for `r ThisYearRUKPercent`% of total exports to the rest of the UK. Over the past 5 years (since `r params$CurrentYear - 5`), international exports from the `r params$ClickedSector` sector have `r IntChanged` by `r abs(VFiveYearPercentChangeInt)`%, while exports to the rest of the UK from this sector have `r RUKChanged` by `r abs(VFiveYearPercentChangeRuk)`% over this period.
+In `r params$CurrentYear`, Scotland's international exports from the `r params$ClickedSector` sector were worth £`r format(ThisYearInt, big.mark=",")` million and accounted for `r ThisYearIntPercent`% of total international exports.  Exports to the rest of the UK from this sector were worth £`r format(ThisYearRUK, big.mark=",")` million in `r params$CurrentYear` and accounted for `r ThisYearRUKPercent`% of total exports to the rest of the UK. Over the past 5 years (since `r params$CurrentYear - 5`), international exports from the `r params$ClickedSector` sector have `r IntChanged` by `r abs(VFiveYearPercentChangeInt)`%, while exports to the rest of the UK from this sector have `r RUKChanged` by `r abs(VFiveYearPercentChangeRuk)`% over this period.
 
-<center>**Figure 1. `r params$ClickedSector`, International and Rest of UK (`r params$StartingYear` - `r params$CurrentYear`) (\£  million)**</center>
+<center>**Figure 1. `r params$ClickedSector`, International and Rest of UK (`r params$StartingYear` - `r params$CurrentYear`) (£  million)**</center>
 
 ```{r figure 1}
-SECTORS <- read.csv("SECTORS.csv")
-DATA <- subset(SECTORS, SECTORS$Sector == params$ClickedSector)
-# Data is in the wide format
-DATA <- DATA[, c("Year", "International", "RUK")]
- 
-# Turn data into a long format   
-library(reshape2)   
-DATA <- melt(DATA,id.vars = "Year")
-names(DATA) <- c("Year","Destination","Value")
+SECTORS <- read.csv("./Base Datatables/SECTORS.csv")
+
+# Data is in the wide format and Turning it into Longer Format
+DATA <-  SECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  select(Year, International, RUK) %>% 
+  pivot_longer(cols = -Year, names_to = "Destination", values_to = "Value") %>% 
+  mutate(TextHover = comma(Value, accuracy = 1, scale = 1))
 
 library(ggplot2)
 library(ggsci)
-ggplot(data = DATA, aes(x = Year, y = Value, fill = Destination)) +
-    geom_col(stat='identity', position="dodge") +
+
+graph1 <- ggplot(data = DATA, aes(x = Year, y = Value, fill = Destination)) +
+    geom_col(stat = 'identity', position = "dodge") +
     theme_minimal() +
-    ylab("Value (\U00A3  million)") +
+    scale_y_continuous(labels = scales::comma, expand  = expand_scale(mult = c(0, 0.25))) +
+    ylab("Value (£ million)") +
     xlab("Year") +
+    labs(caption = paste("Source: Export Statistics Scotland", Yr,"\n",
+                         "Estimates are rounded to the nearest £5 million.")) +
     scale_fill_jama() +
-    theme(legend.position="bottom") +
-    geom_text(aes(label=Value), position=position_dodge(width=0.9), size = 3, vjust=-1) +
+    theme(
+      legend.position = "bottom",
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    ) +
+    geom_text(aes(label = TextHover, angle = 90), colour = "black", 
+              position = position_dodge(width = 0.9), size = 3, 
+              vjust = 0.25, hjust = -0.25) +
     scale_x_continuous(breaks = seq(params$StartingYear, params$CurrentYear))
 
+
+print(graph1)
+
+```
+
+```{r pagebreak, results = "asis", eval = is_latex_output()} 
+cat("\\pagebreak")
 ```
 
 `r if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade" | params$ClickedSector == "Food and Drink"){paste("## **Export Performance by Subsector - International**", sep="")}`
 
 
-`r if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade" | params$ClickedSector == "Food and Drink"){paste("In ", params$CurrentYear, ", the top subsector for international exports was ", TopSubsectorINTName, " which accounted for \\£", format(TopSubsectorINTValue,big.mark=","), " million (",  TopSubsectorINTPercent,"% of all international exports) in ", params$CurrentYear, ".", sep="")}`
+`r if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade" | params$ClickedSector == "Food and Drink"){paste("In ", params$CurrentYear, ", the top subsector for international exports was ", TopSubsectorINTName, " which accounted for £", format(TopSubsectorINTValue,big.mark=","), " million (",  TopSubsectorINTPercent,"% of all international exports) in ", params$CurrentYear, ".", sep="")}`
 
 
 <center>`r if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade" | params$ClickedSector == "Food and Drink"){paste("**Figure 2. ", params$ClickedSector, ", International Exports by Subsector, ", params$StartingYear, " - ", params$CurrentYear, "**", sep="")}`</center>
 
 ```{r figure 2}
-SUBSECTORS <- read.csv("SUBSECTORS.csv")
-DATA2 <- subset(SUBSECTORS, SUBSECTORS$Sector == params$ClickedSector)
+SUBSECTORS <- read.csv("./Base Datatables/SUBSECTORS.csv")
+DATA2 <- SUBSECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  select(Year, Subsector, International) %>% 
+  mutate(Text1 = comma(International, accuracy = 1, scale = 1)) %>% 
+  mutate(Subsector = str_wrap(Subsector, 30))
 # Data is in the wide format
-DATA2 <- DATA2[, c("Year", "Subsector", "International")]
 
 library(ggplot2)
 library(ggsci)
 
-if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade"| params$ClickedSector == "Food and Drink"){
-ggplot(data = DATA2, aes(x = Year, y = International, colour = Subsector)) +
+if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade"| params$ClickedSector == "Food and Drink") {
+  ggplot(data = DATA2, aes(x = Year, y = International, colour = Subsector)) +
     geom_line(size=1.5) +
     theme_minimal() +
-    ylab("Value (\U00A3  million)") +
+    ylab("Value (£  million)") +
     xlab("Year") +
-    scale_color_jama() +
-    theme(legend.position="bottom") +
-    geom_text(aes(label=International), position=position_dodge(width=0.9), size = 3, vjust=-1) +
+    labs(caption = paste("Source: Export Statistics Scotland", Yr,"\n",
+                         "Estimates are rounded to the nearest £5 million.")) +
+    scale_colour_manual(values = jama_palette1) +
+    theme(
+      legend.position = "bottom",
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    ) +
+    geom_label_repel(data = DATA2 %>% filter(Year == min(as.numeric(Year))),
+                     aes(label = Text1), size = 3, direction = "both", 
+                     vjust = -1, hjust = 0.05,
+                     label.size = NA,
+                     label.padding = 0,  point.padding = 0.25, box.padding = 0.25,
+                     show.legend = FALSE,
+                     nudge_y = case_when(
+                       params$ClickedSector == "Transportation and Storage" ~ 20,
+                       params$ClickedSector == "Life Sciences" ~ 5,
+                       params$ClickedSector == "Technology, Digital and Media" ~ 5,
+                       TRUE ~ 30
+                     ),
+                     min.segment.length = 0) +
+        geom_label_repel(data = DATA2 %>% filter(Year == max(as.numeric(Year))),
+                     aes(label = Text1), size = 3, direction = "both", 
+                     vjust = -1, hjust = -0.05,
+                     label.size = NA,
+                     label.padding = 0,  point.padding = 0.25, box.padding = 0.25,
+                     show.legend = FALSE,
+                     nudge_y = case_when(
+                       params$ClickedSector == "Transportation and Storage" ~ 20,
+                       params$ClickedSector == "Life Sciences" ~ 5,
+                       params$ClickedSector == "Technology, Digital and Media" ~ 5,
+                       TRUE ~ 30
+                     ),
+                     min.segment.length = 0) +
     scale_x_continuous(breaks = seq(params$StartingYear, params$CurrentYear)) +
-    geom_point(aes(color = "9"))
-    }
+    scale_y_continuous(labels = scales::comma, expand  = expand_scale(mult = c(0.1, 0.1))) +
+    geom_point(color = "gray23")
+}
 ```
 
 
 `r if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade"| params$ClickedSector == "Food and Drink"){paste("## **Export Performance by Subsector - Rest of the UK**", sep="")}`
 
 
-`r if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade" | params$ClickedSector == "Food and Drink"){paste("In ", params$CurrentYear, ", the top subsector for exports to the rest of the UK was ", TopSubsectorRUKName, " which accounted for \\£", format(TopSubsectorRUKValue, big.mark=",") , " million (",  TopSubsectorRUKPercent,"% of all exports to the rest of UK) in ", params$CurrentYear, ".", sep="")}`
+`r if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade" | params$ClickedSector == "Food and Drink"){paste("In ", params$CurrentYear, ", the top subsector for exports to the rest of the UK was ", TopSubsectorRUKName, " which accounted for £", format(TopSubsectorRUKValue, big.mark=",") , " million (",  TopSubsectorRUKPercent,"% of all exports to the rest of UK) in ", params$CurrentYear, ".", sep="")}`
 
 <center>`r if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade"| params$ClickedSector == "Food and Drink"){paste("**Figure 3. ", params$ClickedSector, ", Exports to Rest of UK by Subsector, ", params$StartingYear, " - ", params$CurrentYear, "**", sep="")}`</center>
 
 ```{r figure 3}
 
-SUBSECTORS <- read.csv("SUBSECTORS.csv")
-DATA7 <- subset(SUBSECTORS, SUBSECTORS$Sector == params$ClickedSector)
+SUBSECTORS <- read.csv("./Base Datatables/SUBSECTORS.csv")
+DATA7 <- SUBSECTORS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  select(Year, Subsector, RUK) %>% 
+  mutate(text1 = comma(RUK, accuracy = 1, scale = 1)) %>% 
+  mutate(Subsector = str_wrap(Subsector, 30))
+
 # Data is in the wide format
-DATA7 <- DATA7[, c("Year", "Subsector", "RUK")]
 
 library(ggplot2)
 library(ggsci)
 
-if(params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade"| params$ClickedSector == "Food and Drink"){
-ggplot(data = DATA7, aes(x = Year, y = RUK, colour = Subsector)) +
-    geom_line(size=1.5) +
+if (params$ClickedSector == "Engineering and Advanced Manufacturing" | params$ClickedSector == "Energy" | params$ClickedSector == "Financial and Business Services" | params$ClickedSector == "Life Sciences" | params$ClickedSector == "Technology, Digital and Media" | params$ClickedSector == "Transportation and Storage" | params$ClickedSector == "Wholesale and Retail Trade" | params$ClickedSector == "Food and Drink") {
+  ggplot(data = DATA7, aes(x = Year, y = RUK, colour = Subsector)) +
+    geom_line(size = 1.5) +
     theme_minimal() +
-    ylab("Value (\U00A3  million)") +
+    ylab("Value (£  million)") +
     xlab("Year") +
-    scale_color_jama() +
-    theme(legend.position="bottom") +
-    geom_text(aes(label=RUK), position=position_dodge(width=0.9), size = 3, vjust=-1) +
+    labs(caption = paste("Source: Export Statistics Scotland", Yr,"\n",
+                         "Estimates are rounded to the nearest £5 million.")) +
+    scale_colour_manual(values = jama_palette1) +
+    theme(
+      legend.position = "bottom",
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    ) +
+       geom_label_repel(data = DATA7 %>% filter(Year == min(as.numeric(Year))),
+                     aes(label = text1), size = 3, direction = "both", 
+                     vjust = -1, hjust = 0.05,
+                     label.size = NA,
+                     label.padding = 0,  point.padding = 0.25, box.padding = 0.25,
+                     show.legend = FALSE,
+                     nudge_y = case_when(
+                       params$ClickedSector == "Transportation and Storage" ~ 20,
+                       params$ClickedSector == "Life Sciences" ~ 5,
+                       params$ClickedSector == "Technology, Digital and Media" ~ 5,
+                       TRUE ~ 30
+                     ),
+                     min.segment.length = 0) +
+        geom_label_repel(data = DATA7 %>% filter(Year == max(as.numeric(Year))),
+                     aes(label = text1), size = 3, direction = "both", 
+                     vjust = -1, hjust = -0.05,
+                     label.size = NA,
+                     label.padding = 0,  point.padding = 0.25, box.padding = 0.25,
+                     show.legend = FALSE,
+                     nudge_y = case_when(
+                       params$ClickedSector == "Transportation and Storage" ~ 20,
+                       params$ClickedSector == "Life Sciences" ~ 5,
+                       params$ClickedSector == "Technology, Digital and Media" ~ 5,
+                       TRUE ~ 30
+                     ),
+                     min.segment.length = 0) +
     scale_x_continuous(breaks = seq(params$StartingYear, params$CurrentYear)) +
-    geom_point(aes(color = "9"))
-  }
+    scale_y_continuous(labels = scales::comma, expand  = expand_scale(mult = c(0.1, 0.1))) +
+    geom_point(color = "gray23")
+}
 ```
+
 
 ## **Current Export Destination Countries**
 Table 1 shows the top international export destinations for the `r params$ClickedSector` sector in `r params$CurrentYear`.
@@ -219,15 +330,17 @@ Table 1 shows the top international export destinations for the `r params$Clicke
 <center>**Table 1. Top Destinations for Exports from `r params$ClickedSector` Sector in `r params$CurrentYear`**</center>
 
 <center>
-```{r table 1, results="asis"}
+```{r table 1, results="asis", strip.white=TRUE, fig.height = 2, fig.width = 9}
 library(flextable)    # For flextable(), which renders table for Word documents.
 library(gridExtra)    # For grid.table(), which renders table for PDF documents.
 library(magrittr)     # For the pipe %>% operator
 library(tableHTML)    # For tableHTML(), which renders table for the website.
+library(grid)
 
-SECTOR_TOP_DESTINATIONS <- read.csv("SECTOR_TOP_DESTINATIONS.csv")
-DATA5 <- subset(SECTOR_TOP_DESTINATIONS, SECTOR_TOP_DESTINATIONS$Sector == params$ClickedSector)
-DATA5  <- DATA5[,c("Rank","Country")]
+SECTOR_TOP_DESTINATIONS <- read.csv("./Base Datatables/SECTOR_TOP_DESTINATIONS.csv")
+DATA5 <- SECTOR_TOP_DESTINATIONS %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  select(Rank, Country)
 
 # Condition that uses different methods to create the table based on document type.
 doc.type <- knitr::opts_knit$get('rmarkdown.pandoc.to')
@@ -235,59 +348,119 @@ if (doc.type == "docx"){
   fx <- flextable(DATA5, cwidth = 2)
   fx <- theme_vanilla(fx)
   fx
-} else if (doc.type == "latex"){
-  grid.table(DATA5)
+} else if (doc.type == "latex") {
+   table1 <- tableGrob(
+     DATA5, 
+      theme = ttheme_default(
+        core = list(fg_params = list(cex = 1.0)),
+        colhead = list(fg_params = list(fontface = "bold", cex = 1.0))
+      ),
+      rows = NULL
+    )
+  
+    grid.draw(table1)
+  
+  # grid.table(DATA5, rows = NULL)
 } else {
   tableHTML(
     DATA5,
     rownames = FALSE,
-    #headers = c("Rank", "Sector", "Value", "% of Total"),
     widths = c(350,350)
   ) %>%
-  add_css_header(css = list('text-align', 'center'), headers = c(1,3,4)) %>%
-  add_css_header(css = list('color', 'white'), headers = c(1,2,3,4)) %>%
-  add_css_header(css = list('background-color', 'grey'), headers = c(1,2,3,4)) %>%
-  add_css_column(css = list('text-align', 'left'), columns = c(2)) %>%
-  add_theme(theme = "rshiny-blue")
+    add_css_header(css = list('text-align', 'center'), headers = c(1,3,4)) %>%
+    add_css_header(css = list('color', 'white'), headers = c(1,2,3,4)) %>%
+    add_css_header(css = list('background-color', 'grey'), headers = c(1,2,3,4)) %>%
+    add_css_column(css = list('text-align', 'left'), columns = c(2)) %>%
+    add_theme(theme = "rshiny-blue")
 }
 ```
 </center>
 
+```{r Last Sentence}
+
+lastSentence <- case_when(
+  !is.na(TotalTurnover) ~ paste("These enterprises generated a turnover of", dollar(prefix = "£", TotalTurnover, accuracy = 1, scale = 1, suffix = " million"),"and employed", comma(TotalEmployment), "people."),
+  TRUE ~ paste("These enterprises employed", comma(TotalEmployment), "people.")
+)
+```
+
 ## **Business Statistics**
-The total number of enterprises in the `r params$ClickedSector` sector was estimated to be `r format(TotalEnterprises, big.mark=",") ` in `r params$CurrentYear`. These enterprises generated a turnover of \£`r format(TotalTurnover, big.mark=",")` million and employed `r format(TotalEmployment, big.mark=",")` people.
+The total number of enterprises in the `r params$ClickedSector` sector was estimated to be `r format(TotalEnterprises, big.mark=",") ` in `r params$CurrentYear`. `r lastSentence`
 
 <center>**Table 2. Business Statistics for the `r params$ClickedSector` Sector in `r params$CurrentYear`**</center>
 
+```{r table2 prep}
+BUSINESS_STATS <- read_csv("./Base Datatables/BUSINESS_STATS.csv", na = "N/A") %>% 
+  mutate_at(c("Enterprises", "Employment","Turnover"), function(x) {as.numeric(x)}) %>% 
+  mutate_if(is.character, function(x) { trimws(x)}) %>% 
+  filter(Sector == params$ClickedSector) %>% 
+  mutate(
+    Enterprises = comma(Enterprises, accuracy = 1, scale = 1),
+    Employment = comma(Employment, accuracy = 1, scale = 1),
+    Turnover = case_when(
+      is.na(Turnover) ~ "-",
+      TRUE ~ dollar(Turnover, accuracy = 1, scale = 1, prefix = "£", suffix = "\n million")
+    )
+  ) %>% 
+  mutate(Order = case_when(
+    Subsector == "Total" ~ 1, 
+    grepl("OTHER ", toupper(Subsector), fixed = TRUE) == TRUE ~ 3,
+    TRUE ~ 2
+  )) %>% 
+  arrange(Order) %>% 
+  select(-Order)
+
+```
+
 <center>
-```{r table 2, results="asis"}
+```{r table 2, results="asis", strip.white=TRUE, fig.height = case_when(nrow(BUSINESS_STATS) == 1 ~ 1, TRUE ~ 4), fig.width = 10}
 library(flextable)    # For flextable(), which renders table for Word documents.
 library(gridExtra)    # For grid.table(), which renders table for PDF documents.
 library(magrittr)     # For the pipe %>% operator
 library(tableHTML)    # For tableHTML(), which renders table for the website.
 
-BUSINESS_STATS <- read.csv("BUSINESS_STATS.csv")
-BUSINESS_STATS <- subset(BUSINESS_STATS, BUSINESS_STATS$Sector == params$ClickedSector)
+
 
 # Condition that uses different methods to create the table based on document type.
 doc.type <- knitr::opts_knit$get('rmarkdown.pandoc.to')
-if (doc.type == "docx"){
-  fx <- flextable(BUSINESS_STATS, cwidth = 1.5)
-  fx <- theme_vanilla(fx)
+if (doc.type == "docx") {
+  fx <- flextable(BUSINESS_STATS, cwidth = (6.5/5)) %>% 
+    theme_vanilla()
   fx
-} else if (doc.type == "latex"){
-  grid.table(BUSINESS_STATS)
+} else if (doc.type == "latex") {
+    halignment <- matrix(c(0, 0, 1, 1, 1), ncol = 5, nrow = nrow(BUSINESS_STATS), byrow = TRUE)
+    xValues <- matrix(c(0, 0, 1, 1, 1), ncol = 5, nrow = nrow(BUSINESS_STATS), byrow = TRUE)
+    
+    table1 <- tableGrob(
+      BUSINESS_STATS, 
+      theme = ttheme_default(
+        core = list(fg_params = list(hjust = as.vector(halignment), 
+                                     x = as.vector(xValues),
+                                     cex = 1.0
+                                     )),
+        colhead = list(fg_params = list(fontface = "bold", cex = 1.0))
+      ),
+      rows = NULL
+    )
+  
+    grid.draw(table1)
 } else {
+  BUSINESS_STATS <- BUSINESS_STATS %>% 
+    mutate_if(is.character, function(x) {gsub("\n", "<br />", x, fixed = TRUE)})
+  
+  
   tableHTML(
     BUSINESS_STATS,
     rownames = FALSE,
+    escape = FALSE,
     widths = c(410, 310, 120, 120, 120)
   ) %>%
-  add_css_header(css = list('text-align', 'center'), headers = c(1,2,3,4,5)) %>%
-  add_css_header(css = list('color', 'white'), headers = c(1,2,3,4,5)) %>%
-  add_css_header(css = list('background-color', 'grey'), headers = c(1,2,3,4,5)) %>%
-  add_css_column(css = list('text-align', 'left'), columns = c(1,2)) %>%
-  add_css_column(css = list('text-align', 'right'), columns = c(3,4,5)) %>%
-  add_theme(theme = "rshiny-blue")
+    add_css_header(css = list('text-align', 'center'), headers = c(1,2,3,4,5)) %>%
+    add_css_header(css = list('color', 'white'), headers = c(1,2,3,4,5)) %>%
+    add_css_header(css = list('background-color', 'grey'), headers = c(1,2,3,4,5)) %>%
+    add_css_column(css = list('text-align', 'left'), columns = c(1,2)) %>%
+    add_css_column(css = list('text-align', 'right'), columns = c(3,4,5)) %>%
+    add_theme(theme = "rshiny-blue")
 }
 ```
 </center>

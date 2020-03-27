@@ -1,17 +1,48 @@
 ---
-title: "NoDataMSG"
-author: "Kamil Szymkowski"
-date: "28/04/2019"
-output: html_document
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+params:
+  ClickedCountry: NA
+  StartingYear: NA
+  CurrentYear: NA
+  disclosive: NA
+
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r global options, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)          # Prevents R code from appearing in the output document.
+knitr::opts_chunk$set(warning = FALSE)       # Prevents warnings from appearing in the output document.
+knitr::opts_chunk$set(message = FALSE)       # Prevents messages from appearing in the output document.
+knitr::opts_chunk$set(fig.align = "center")  # Centers all the plots.
+knitr::opts_chunk$set(out.width = '100%')    # Makes plots occupy 100% of the page's width.
+knitr::opts_chunk$set(fig.width = 10)        # Makes plots 10 inch wide.
 ```
 
-## No Data
+# **Scotland's Exports to `r params$ClickedCountry` in `r params$CurrentYear`**
 
-Data on the clicked country cannot be display. This might be because:
+```{r Getting the flag Name}
+flag_title <- params$ClickedCountry
 
-* Scotland does not export to this country or we do not hold data on this country.
-+ Available data is not robust enough to be published (less than \£50 million).
+if (flag_title == "UAE") {flag_title <- "United Arab Emirates"}
+
+flag_title <- paste(flag_title, "png", sep = ".")
+flag_title <- paste("./www/flags/", flag_title, sep = "")
+```
+
+<center>![](`r flag_title`)</center> 
+
+
+```{r Getting Reason for not displaying}
+reasonNotDisplay <- paste(
+  "This is because",
+  case_when(
+  params$disclosive == "YES" ~ "available data for this country is not robust enough to be published (less than £50 million).",
+  params$disclosive == "NO" ~ "Scotland does not export to this country or we do not hold data on this country."
+)
+)
+```
+
+Data on `r params$ClickedCountry` cannot be displayed. `r reasonNotDisplay`
+

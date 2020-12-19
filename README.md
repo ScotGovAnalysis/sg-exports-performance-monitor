@@ -1,6 +1,8 @@
 # Exports Performance Monitor
 Code behind the Scottish Government's application for display of exports data titled "Exports Performance Monitor". The highlight of the code is the original solution to generate downloadable reports, where R markdown document is used to render the report on the app as well as for rendering the document in the form of PDF and Word document. Additionally, the repository includes code used for generating gif animations to produce a rank bar chart.
 
+![Image of the home page](https://github.com/DataScienceScotland/sg-exports-performance-monitor/blob/master/exports.png?raw=true)
+
 ## 🔗 Links
 * [Exports Performance Monitor (This shiny app)](https://scotland.shinyapps.io/sg-exports-performance-monitor/)
 * [Scotland's export performance monitor (Excel spreadsheet)](https://www.gov.scot/publications/scotlands-export-performance-monitor/)
